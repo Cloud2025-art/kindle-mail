@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 — Prepared for community submission
+## 0.1.1 — Initial public release
 
 - Add English documentation and a Chinese step-by-step tutorial, privacy disclosure, MIT license and dependency notices.
 - Add a portable source layout, locked dependencies and build/test scripts.
@@ -9,7 +9,7 @@
 - Improve settings snapshots, export-path validation and SMTP test feedback.
 - Preserve the existing plugin ID, command IDs and settings structure for users of 0.1.0.
 
-This version is prepared locally; this changelog does not imply a public release or community approval.
+Published on GitHub on 2026-10-20. Obsidian Community submission and approval are separate steps and are not yet complete.
 
 ## 0.1.0 — Personal working version
 

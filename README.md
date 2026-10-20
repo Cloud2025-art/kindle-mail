@@ -2,7 +2,7 @@
 
 Turn a note into a readable EPUB and send it to your Kindle through your own email account. Write and collect articles in Obsidian, then read them later on your Kindle.
 
-**[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
+**[Download 0.1.1](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.1)** · **[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
 
 By James C. Free and open source under the MIT license. An independent community project, not affiliated with or endorsed by Amazon or Obsidian.
 
@@ -26,7 +26,7 @@ You do not need to export before sending. This first release has a Chinese inter
 
 The plugin is being prepared for community submission. Until accepted, install it manually:
 
-1. Download `main.js` and `manifest.json` from this repository's GitHub release when available.
+1. Download `main.js` and `manifest.json` from the [0.1.1 release](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.1), or extract the `kindle-mail-0.1.1.zip` attachment.
 2. In Obsidian, open **Settings → Community plugins** and click the folder icon next to **Installed plugins**. This opens the plugin folder for the actual vault you are using.
 3. Create a `kindle-mail` folder there, and put both files directly inside it:
 
