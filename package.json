@@ -1,0 +1,20 @@
+{
+  "name": "kindle-mail",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Export Markdown notes as EPUB and send them to Kindle using your own SMTP account.",
+  "author": "James C",
+  "license": "MIT",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "check": "npm run test && npm run build"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "jszip": "^3.10.2",
+    "nodemailer": "^10.1.7",
+    "markdown-it": "^15.0.3"
+  }
+}

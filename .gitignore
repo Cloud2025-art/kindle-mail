@@ -1,0 +1,10 @@
+node_modules/
+.pnpm-store/
+main.js
+release-notices.md
+*.epub
+data.json
+.obsidian/
+.env*
+coverage/
+test-output/
