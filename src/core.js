@@ -3,8 +3,9 @@ const MarkdownIt = require("markdown-it");
 const crypto = require("crypto");
 const clean = (s) => String(s).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\ufffe\uffff]/g, "");
 const xml = (s) => clean(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]);
-async function buildEpub({ title, author, markdown, resolve, read, root }) {
+async function buildEpub({ title, author, markdown, resolve, read, root, includeEmbeddedNotes = false }) {
   const warnings = /* @__PURE__ */ new Set(), assets = [], ids = /* @__PURE__ */ new Map();
+  const includedNotes = new Set([root]);
   let total = 0, noteReads = 0, markdownBytes = 0;
   const md = new MarkdownIt({ html: false, xhtmlOut: true, linkify: false, breaks: false });
   async function expand(text, source, chain = []) {
@@ -36,10 +37,17 @@ async function buildEpub({ title, author, markdown, resolve, read, root }) {
               const file = resolve(path, source);
               if (file && file.extension === "md") {
                 const n = new child.constructor("html_inline", "", 0);
-                if (fragment || chain.includes(file.path) || chain.length >= 3) {
+                if (!includeEmbeddedNotes) {
+                  n.content = xml("[未包含嵌入笔记：" + target + "]");
+                  warnings.add("嵌入笔记默认不包含；需要时请在设置中开启，并核对发送清单");
+                } else if (fragment || chain.includes(file.path) || chain.length >= 3) {
                   n.content = xml("[未展开嵌入：" + target + "]");
                   warnings.add("部分嵌入因循环、深度或章节定位限制未展开");
-                } else n.content = (await expand(await read(file, false), file.path, [...chain, file.path])).replace(/<(\/?)(h[1-6]|p|ul|ol|li|pre|blockquote|table|thead|tbody|tr|td|th)(?: [^>]*)?>/g, (_, close) => close ? "</span>" : '<span style="display:block">');
+                } else {
+                  const content = await read(file, false);
+                  includedNotes.add(file.path);
+                  n.content = (await expand(content, file.path, [...chain, file.path])).replace(/<(\/?)(h[1-6]|p|ul|ol|li|pre|blockquote|table|thead|tbody|tr|td|th)(?: [^>]*)?>/g, (_, close) => close ? "</span>" : '<span style="display:block">');
+                }
                 children.push(n);
               } else {
                 const n = new child.constructor("image", "img", 0);
@@ -81,7 +89,7 @@ async function buildEpub({ title, author, markdown, resolve, read, root }) {
             const name = "images/" + assets.length + "." + ext;
             total += bytes.length;
             ids.set(file.path, name);
-            assets.push({ name, bytes, type: ext === "jpg" || ext === "jpeg" ? "image/jpeg" : "image/" + ext });
+            assets.push({ name, path: file.path, bytes, type: ext === "jpg" || ext === "jpeg" ? "image/jpeg" : "image/" + ext });
           }
           t.attrSet("src", ids.get(file.path));
         }
@@ -103,6 +111,6 @@ async function buildEpub({ title, author, markdown, resolve, read, root }) {
   zip.file("EPUB/style.css", "body{line-height:1.7;font-family:serif}h1,h2,h3{line-height:1.3}img{max-width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere}blockquote{border-left:2px solid #888;margin-left:0;padding-left:1em}table{border-collapse:collapse;width:100%}td,th{border:1px solid #aaa;padding:.3em}a{overflow-wrap:anywhere}");
   for (const a of assets) zip.file("EPUB/" + a.name, a.bytes);
   zip.file("EPUB/package.opf", '<?xml version="1.0" encoding="utf-8"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">' + uid + "</dc:identifier><dc:title>" + xml(title) + "</dc:title><dc:creator>" + xml(author || "Obsidian") + '</dc:creator><dc:language>zh-CN</dc:language><meta property="dcterms:modified">' + (/* @__PURE__ */ new Date()).toISOString().replace(/\.\d{3}Z$/, "Z") + '</meta></metadata><manifest><item id="content" href="content.xhtml" media-type="application/xhtml+xml"/><item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/><item id="css" href="style.css" media-type="text/css"/>' + assets.map((a, i) => '<item id="img' + i + '" href="' + a.name + '" media-type="' + a.type + '"/>').join("") + '</manifest><spine><itemref idref="content"/></spine></package>');
-  return { buffer: await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }), warnings: [...warnings], images: assets.length };
+  return { buffer: await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" }), warnings: [...warnings], images: assets.length, notes: [...includedNotes], imagePaths: assets.map(a => a.path) };
 }
 module.exports = { buildEpub };

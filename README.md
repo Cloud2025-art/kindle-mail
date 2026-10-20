@@ -2,7 +2,9 @@
 
 Turn a note into a readable EPUB and send it to your Kindle through your own email account. Write and collect articles in Obsidian, then read them later on your Kindle.
 
-**[Download 0.1.1](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.1)** · **[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
+**[Download 0.1.2](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.2)** · **[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
+
+Published on GitHub for manual installation. Listing in the Obsidian Community directory is not yet confirmed.
 
 By James C. Free and open source under the MIT license. An independent community project, not affiliated with or endorsed by Amazon or Obsidian.
 
@@ -24,9 +26,9 @@ You do not need to export before sending. This first release has a Chinese inter
 
 ## Installation
 
-The plugin is being prepared for community submission. Until accepted, install it manually:
+Install this update manually:
 
-1. Download `main.js` and `manifest.json` from the [0.1.1 release](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.1), or extract the `kindle-mail-0.1.1.zip` attachment.
+1. Download `main.js` and `manifest.json` from the [0.1.2 release](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.2), or extract `kindle-mail-0.1.2.zip`. Disable Kindle Mail before replacing an existing installation. Back up the old `main.js` and `manifest.json`; keep your existing `data.json`.
 2. In Obsidian, open **Settings → Community plugins** and click the folder icon next to **Installed plugins**. This opens the plugin folder for the actual vault you are using.
 3. Create a `kindle-mail` folder there, and put both files directly inside it:
 
@@ -83,7 +85,7 @@ QQ and 163 presets are available. Enable SMTP with the provider and use its auth
 1. Open a Markdown note and let Obsidian save your edits.
 2. Press **Ctrl+P** (Windows/Linux) or **Cmd+P** (macOS).
 3. Run **Kindle Mail: 发送当前笔记到 Kindle**.
-4. Review the note title, destination address, attachment size, image count, and any conversion warnings. Confirm **发送** (Send).
+4. Review the sender, destination address, SMTP host, every included note and image path, attachment size and conversion warnings. Confirm **发送** (Send). Canceling does not read the password, create a mail transport or send a message.
 5. Wait for the SMTP acceptance message. Connect your Kindle to the Internet and allow Amazon time to process the document.
 
 You can also right-click a Markdown file and choose **发送到 Kindle**. Assign a shortcut under **Settings → Hotkeys** if you send often.
@@ -98,11 +100,13 @@ Run **Kindle Mail: 导出当前笔记为 EPUB** to keep a local copy or check fo
 
 - Chinese and other UTF-8 text; standard Markdown headings, paragraphs, lists, quotes, tables, links and code.
 - Leading YAML frontmatter is excluded.
-- Full-note `![[embeds]]`, including relative local images. Maximum nesting: root plus two embedded note levels. Cycles, deeper embeds and section/block embeds show a visible omission marker.
+- Full-note `![[embeds]]` are **excluded by default**. Enable **包含嵌入笔记正文** only when needed and check the complete file list before sending. Maximum nesting: root plus two embedded note levels. Cycles, deeper embeds and section/block embeds show a visible omission marker. Local image references still work with note embedding disabled.
 - Local PNG, JPEG and GIF images, with basic signature checking. Original bytes are packaged, so source metadata and animation may remain; rendering depends on the reader.
 - Wikilinks become display text. Raw HTML is escaped. Remote images are replaced with text and are never downloaded.
 - Maximum local image: 10 MiB; total images: 20 MiB. Maximum EPUB sent: 25 MiB. Email services may impose lower limits after MIME encoding.
 - Expansion is bounded to 100 note reads and 5 MiB of combined Markdown; image count is limited to 100.
+- Fresh vault file sizes are checked before reads and actual sizes after reads. Hidden files, invalid paths and files not registered in the current vault are refused. A file growing between the checks can still briefly allocate memory before the second check stops processing.
+- The installed bundle uses SMTP only, does not import `fs` or `child_process`, replaces dependency filesystem calls with denial functions, and replaces the string-executing scheduler fallback with a function-only implementation. These build protections are required; do not bypass `scripts/build.cjs`.
 
 Not converted: SVG, WebP, PDF, Canvas, Dataview, Mermaid and other plugin-rendered content. Checkboxes and `==highlight==` receive no special conversion. Callouts appear as ordinary blockquotes. Embedded notes use simplified block styling. Heading navigation is limited to a single document entry. This is a one-way send, not a live update or Kindle annotation sync.
 
@@ -132,10 +136,9 @@ Use Node.js 22+ and pnpm 11:
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm test
-pnpm build
+pnpm check
 ```
 
-The output `main.js` is bundled with dependencies and requires no package installation by users. Release tags must equal the manifest version exactly, e.g. `0.1.1`, without `v`. Attach `main.js`, `manifest.json`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` individually to the release. The Obsidian installer fetches the first two; bundled license comments are also retained in `main.js`.
+The output `main.js` is bundled with dependencies and requires no package installation by users. Release tags must equal the manifest version exactly, e.g. `0.1.2`, without `v`. Attach `main.js`, `manifest.json`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` individually to the release. The Obsidian installer fetches the first two; bundled license comments are also retained in `main.js`. Build source labels are normalized to avoid embedding the dependency directory of the build machine. Direct dependency versions and the full dependency tree are locked; CI runs a frozen install, build and tests.
 
-The original 0.1.0 version was reported by the user to deliver successfully through Gmail to Kindle on Windows with Obsidian 1.14.4. Automated tests cover EPUB construction, escaping, embeds, image handling, resource bounds and email attachment construction. Version 0.1.1 includes hardening changes and needs an updated live send smoke test. Other desktop operating systems and email providers have not been verified.
+On 2026-10-20 the author confirmed successful delivery of version 0.1.2 through Gmail (TLS port 465) to Kindle on Windows with Obsidian 1.14.4; both note text and local images displayed correctly. Automated tests cover EPUB construction, escaping, embeds, image handling, pre-read resource bounds, cancellation, email attachments and the installed bundle's simulated SMTP exchange. Simulated TLS tests do not replace validation with real email providers. Other desktop operating systems and email providers have not been verified. Community approval is not a guarantee of zero security risk.

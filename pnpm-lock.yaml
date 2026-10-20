@@ -9,16 +9,16 @@ importers:
   .:
     dependencies:
       esbuild:
-        specifier: ^0.28.2
+        specifier: 0.28.2
         version: 0.28.2
       jszip:
-        specifier: ^3.10.2
+        specifier: 3.10.2
         version: 3.10.2
       markdown-it:
-        specifier: ^15.0.3
+        specifier: 15.0.3
         version: 15.0.3
       nodemailer:
-        specifier: ^10.1.7
+        specifier: 10.1.7
         version: 10.1.7
 
 packages:

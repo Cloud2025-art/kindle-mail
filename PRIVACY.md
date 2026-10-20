@@ -2,7 +2,7 @@
 
 ## Local processing
 
-The plugin reads the selected Markdown file from the current vault and follows full-note embeds and supported local image references. Leading YAML frontmatter is removed from notes. The export may include text from embedded notes, so review the content before sending. No whole-vault upload is performed.
+The plugin reads the selected Markdown file from the current vault and supported local image references. Full-note embeds are excluded by default; they are followed only if you explicitly enable that setting. Leading YAML frontmatter is removed from notes. The confirmation lists every included note and image path, the sender, recipient and SMTP host. No whole-vault upload is performed. Images retain their original metadata.
 
 The EPUB is generated in memory. Export writes the EPUB to the configured folder inside the vault; your existing vault synchronization may subsequently copy it elsewhere. Sending does not save an EPUB to disk through the export command.
 
@@ -13,6 +13,8 @@ The EPUB is generated in memory. Export writes the EPUB to the configured folder
 - **Export:** no network use by the plugin.
 
 The plugin enforces TLS with certificate verification. Port 465 uses implicit TLS; port 587 requires STARTTLS. SMTP authentication does not support OAuth in this release.
+
+The 0.1.2 bundle excludes sendmail and child_process, disables mail-dependency filesystem access at build time, and removes the string-to-code scheduler fallback. Build and test tools use filesystem APIs locally but are not loaded by the installed plugin. This is not an operating-system sandbox: Obsidian APIs and other plugins remain trusted, and vault symlinks or files changing during reads cannot be fully isolated by these checks.
 
 Remote image URLs are not fetched. No Amazon internal API, Amazon account login, developer backend, advertising, telemetry, or analytics is used by the plugin. Amazon and your email provider handle their own delivery records and policies.
 

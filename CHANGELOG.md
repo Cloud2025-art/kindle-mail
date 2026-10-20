@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 — 2026-10-20
+
+- Exclude embedded note contents by default; list all included note/image paths and SMTP destination before sending.
+- Check fresh vault sizes and budgets before reads and actual sizes afterwards; reject hidden, invalid and unregistered paths.
+- Import only Nodemailer's SMTP transport; deny dependency filesystem calls in the installed bundle and replace the dynamic-code scheduler fallback.
+- Explicitly verify TLS certificates, keep credentials inaccessible until confirmation and redact raw SMTP errors.
+- Pin direct dependency versions and fail builds that include prohibited runtime imports or dynamic compilation.
+- Add security regression tests and installed-bundle tests, normalize build source labels, and add a frozen-install CI workflow.
+- Author confirmed live Gmail-to-Kindle delivery on Windows with Obsidian 1.14.4; note text and local images displayed correctly. GitHub publication does not imply acceptance into the Obsidian Community directory.
+
 ## 0.1.1 — Initial public release
 
 - Add English documentation and a Chinese step-by-step tutorial, privacy disclosure, MIT license and dependency notices.
