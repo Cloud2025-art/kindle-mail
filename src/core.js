@@ -8,6 +8,18 @@ async function buildEpub({ title, author, markdown, resolve, read, root, include
   const includedNotes = new Set([root]);
   let total = 0, noteReads = 0, markdownBytes = 0;
   const md = new MarkdownIt({ html: false, xhtmlOut: true, linkify: false, breaks: false });
+  // Capture the whole Obsidian embed before Markdown emphasis can split filenames.
+  // Inline parsing leaves fenced code and inline code untouched.
+  md.inline.ruler.before("image", "kindle_embed", (state, silent) => {
+    const match = /^!\[\[([^\]\r\n]+)\]\]/.exec(state.src.slice(state.pos, state.posMax));
+    if (!match) return false;
+    if (!silent) {
+      const token = state.push("kindle_embed", "", 0);
+      token.content = match[0];
+    }
+    state.pos += match[0].length;
+    return true;
+  });
   async function expand(text, source, chain = []) {
     noteReads += 1;
     markdownBytes += Buffer.byteLength(text, "utf8");
@@ -20,7 +32,7 @@ async function buildEpub({ title, author, markdown, resolve, read, root, include
         if (t.type === "inline") {
           const children = [];
           for (const child of t.children || []) {
-            if (child.type !== "text") {
+            if (child.type !== "text" && child.type !== "kindle_embed") {
               children.push(child);
               continue;
             }

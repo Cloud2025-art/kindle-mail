@@ -25,6 +25,24 @@ async function unpack(result) {
   return { zip, html: await zip.file('EPUB/content.xhtml').async('string') };
 }
 
+test('Obsidian embeds preserve underscored filenames and width aliases as two images', async () => {
+  const second = 'Ancient_Times_Roman_-_016_-_Costumes_of_All_Nations_(1883).png';
+  const result = await buildEpub(options('![[first.png]]\n\n![[' + second + '|800]]', {}, { 'first.png': png, [second]: png }));
+  const { html, zip } = await unpack(result);
+  assert.equal(result.images, 2);
+  assert.deepEqual(result.imagePaths, ['first.png', second]);
+  assert.equal((html.match(/<img /g) || []).length, 2);
+  assert(zip.file('EPUB/images/0.png'));
+  assert(zip.file('EPUB/images/1.png'));
+  assert(!html.includes('![['));
+});
+
+test('underscored embeds in inline and fenced code do not read files', async () => {
+  const result = await buildEpub(options('`![[a_-_b.png|800]]`\n\n```\n![[a_-_b.png|800]]\n```', {}, { 'a_-_b.png': png }));
+  assert.equal(result.images, 0);
+  assert.equal((await unpack(result)).html.match(/!\[\[/g).length, 2);
+});
+
 test('EPUB includes an uncompressed leading mimetype, OPF, spine and navigation', async () => {
   const result = await buildEpub(options('# 文章\n\n正文'));
   const { zip, html } = await unpack(result);

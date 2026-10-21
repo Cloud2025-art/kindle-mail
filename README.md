@@ -2,7 +2,9 @@
 
 Turn a note into a readable EPUB and send it to your Kindle through your own email account. Write and collect articles in Obsidian, then read them later on your Kindle.
 
-**[Download 0.1.2](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.2)** · **[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
+**[Download 0.1.4](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.4)** · **[中文使用教程](docs/使用教程.md)** · [Privacy](PRIVACY.md) · [Release notes](CHANGELOG.md)
+
+Version 0.1.4 fixes missing Obsidian image embeds when filenames contain Markdown emphasis characters such as underscores. It also removes legacy script-element scheduling code. All 30 automated tests passed locally; repeated builds produced identical output.
 
 Published on GitHub for manual installation. Listing in the Obsidian Community directory is not yet confirmed.
 
@@ -28,7 +30,7 @@ You do not need to export before sending. This first release has a Chinese inter
 
 Install this update manually:
 
-1. Download `main.js` and `manifest.json` from the [0.1.2 release](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.2), or extract `kindle-mail-0.1.2.zip`. Disable Kindle Mail before replacing an existing installation. Back up the old `main.js` and `manifest.json`; keep your existing `data.json`.
+1. Download `main.js` and `manifest.json` from the [0.1.4 release](https://github.com/Cloud2025-art/kindle-mail/releases/tag/0.1.4), or extract `kindle-mail-0.1.4.zip`. Disable Kindle Mail before replacing an existing installation. Back up the old `main.js` and `manifest.json`; keep your existing `data.json`.
 2. In Obsidian, open **Settings → Community plugins** and click the folder icon next to **Installed plugins**. This opens the plugin folder for the actual vault you are using.
 3. Create a `kindle-mail` folder there, and put both files directly inside it:
 
@@ -139,6 +141,6 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The output `main.js` is bundled with dependencies and requires no package installation by users. Release tags must equal the manifest version exactly, e.g. `0.1.2`, without `v`. Attach `main.js`, `manifest.json`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` individually to the release. The Obsidian installer fetches the first two; bundled license comments are also retained in `main.js`. Build source labels are normalized to avoid embedding the dependency directory of the build machine. Direct dependency versions and the full dependency tree are locked; CI runs a frozen install, build and tests.
+The output `main.js` is bundled with dependencies and requires no package installation by users. Release tags must equal the manifest version exactly, e.g. `0.1.4`, without `v`. Attach `main.js`, `manifest.json`, `LICENSE`, and `THIRD-PARTY-NOTICES.md` individually to the release. The Obsidian installer fetches the first two; bundled license comments are also retained in `main.js`. Build source labels are normalized to avoid embedding the dependency directory of the build machine. Direct dependency versions and the full dependency tree are locked; CI runs a frozen install, build and tests.
 
 On 2026-10-20 the author confirmed successful delivery of version 0.1.2 through Gmail (TLS port 465) to Kindle on Windows with Obsidian 1.14.4; both note text and local images displayed correctly. Automated tests cover EPUB construction, escaping, embeds, image handling, pre-read resource bounds, cancellation, email attachments and the installed bundle's simulated SMTP exchange. Simulated TLS tests do not replace validation with real email providers. Other desktop operating systems and email providers have not been verified. Community approval is not a guarantee of zero security risk.

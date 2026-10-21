@@ -7,12 +7,14 @@ const { Duplex } = require('node:stream');
 const { isBuiltin } = require('node:module');
 const bundlePath = path.join(__dirname, '../main.js');
 
-function loadBundle() {
+function loadBundle(overrides = {}) {
   const imported = [];
   const source = fs.readFileSync(bundlePath, 'utf8');
   assert(!/\bnew\s+Function\s*\(|\beval\s*\(|require\(["'](?:node:)?(?:fs|child_process)["']\)/.test(source));
+  assert(!/\bcreateElement\s*\(\s*["'`]script["'`]/i.test(source));
   const context = vm.createContext({
     module: { exports: {} }, Buffer, process, console, setTimeout, clearTimeout, setInterval, clearInterval,
+    ...overrides,
     require(name) {
       imported.push(name);
       if (name === 'obsidian') return { Plugin: class {}, Modal: class {}, PluginSettingTab: class {} };
@@ -24,6 +26,16 @@ function loadBundle() {
   new vm.Script(source + '\nmodule.exports = { Mailer: require_mailer(), createTransport: require_smtp().createTransport, buildEpub: require_core().buildEpub };').runInContext(context);
   return { ...context.module.exports, imported, context };
 }
+
+test('Promise fallback generates EPUB without touching the DOM', { skip: !fs.existsSync(bundlePath) }, async () => {
+  const { buildEpub } = loadBundle({
+    Promise: undefined,
+    process: { browser: true, env: {}, version: process.version, nextTick: process.nextTick },
+    document: new Proxy({}, { get() { throw new Error('Unexpected DOM access'); } }),
+  });
+  const result = await buildEpub({ title: 'Fallback', author: 'Me', root: 'root.md', markdown: '# fallback', resolve: () => null, read: async () => { throw new Error('unexpected read'); } });
+  assert(result.buffer.length > 0);
+});
 
 test('installed bundle generates EPUB without fs, child_process or dynamic compilation', { skip: !fs.existsSync(bundlePath) }, async () => {
   const bundle = loadBundle();

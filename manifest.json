@@ -1,7 +1,7 @@
 {
   "id": "kindle-mail",
   "name": "Kindle Mail",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "minAppVersion": "1.11.4",
   "description": "Export notes as EPUB and send them to Kindle using your own SMTP email account.",
   "author": "James C",

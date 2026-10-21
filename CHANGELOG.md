@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.4 — 2026-10-21
+
+- Parse Obsidian embeds before Markdown emphasis, preserving filenames containing underscores and width aliases such as |800.
+- Add regression coverage for two distinct image paths and preserve literal embeds in inline/fenced code.
+- Retain all 0.1.3 runtime security restrictions.
+
+## 0.1.3 — 2026-10-21
+
+- Replace immediate's legacy browser scheduler with a function-only scheduler; remove script-element creation from the installed bundle.
+- Fail builds and bundle checks if script-element creation returns.
+- Test EPUB generation with no native Promise and with DOM access blocked.
+- Preserve the SMTP-only transport, denied filesystem operations, TLS verification and dynamic-compilation restrictions.
+
 ## 0.1.2 — 2026-10-20
 
 - Exclude embedded note contents by default; list all included note/image paths and SMTP destination before sending.

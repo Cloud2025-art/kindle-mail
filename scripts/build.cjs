@@ -24,6 +24,7 @@ async function build() {
       setup(build) {
         build.onResolve({ filter: /^(?:node:)?fs(?:\/promises)?$/ }, () => ({ path: path.join(root, 'src/filesystem-disabled.js') }));
         build.onResolve({ filter: /^setimmediate$/ }, () => ({ path: path.join(root, 'src/immediate-safe.js') }));
+        build.onResolve({ filter: /^immediate$/ }, () => ({ path: path.join(root, 'src/task-scheduler.js') }));
         build.onResolve({ filter: /^(?:node:)?child_process$/ }, () => ({ errors: [{ text: 'System command execution is forbidden in the installed plugin.' }] }));
       }
     }],
@@ -40,6 +41,9 @@ async function build() {
     .replace(/^(\s*")[^"\r\n]*node_modules\/([^"\r\n]+)("\([^\r\n]*)$/gm, '$1node_modules/$2$3');
   if (/\bnew\s+Function\s*\(|\beval\s*\(|require\(["'](?:node:)?(?:fs|child_process)["']\)/.test(output)) {
     throw new Error('Forbidden runtime capability in build output.');
+  }
+  if (/\bcreateElement\s*\(\s*["'`]script["'`]/i.test(output)) {
+    throw new Error('Script element creation is forbidden in the installed plugin.');
   }
   fs.writeFileSync(path.join(root, 'main.js'), output);
   // Place full notices next to downloadable assets as well as in the source tree.
